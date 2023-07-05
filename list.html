@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vocab App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<!-- <h1>My training vocab app</h1> -->
+<input type="button" id="site" value="forward->"> 
+<h2>Add new word:</h2>
+<input id='Article' type="text" placeholder="Article or Type:">
+<input id='Word' type="text" placeholder="Word:">
+<input id='Meaning' type="text" placeholder="Meaning:">
+<input id='submit' type="submit">
+<div id='container' style='width=100%' display='flex' margin='0 px'>
+    <h2>Words: Stage: Occurances:</h2>
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-database.js"></script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, set, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1Cuzq95imnDZusfvqg_yCFGFcBsykk94",
+    authDomain: "vocab-c012d.firebaseapp.com",
+    projectId: "vocab-c012d",
+    storageBucket: "vocab-c012d.appspot.com",
+    messagingSenderId: "695356338687",
+    appId: "1:695356338687:web:a83de2d8ab45467d0477ca",
+    measurementId: "G-JZJNPDRVVL",
+    databaseURL: "https://vocab-c012d-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+    
+    
+    
+    
+  const params = new URLSearchParams(window.location.search);
+    if (params.get("pack") != null) {
+        var PACK = params.get("pack");
+    } else {
+        var PACK = "german";
+    };     
+    
+
+  function toSite(){
+        // Assuming you have some data stored in variables
+      //data I'm transferring: pack type
+    // Construct the URL with query parameters
+    let url = window.location.href;
+    console.log(url);
+    url = url.split("/list")[0];
+    //console.log(url);
+    url += '/vocab.html'; //should just get path by itself maybe
+    url += "?pack=" + encodeURIComponent(PACK);
+    //console.log(url);
+    // Navigate to the new page
+    window.location.href = url;
+    //<a href="#wordList"><a>
+  };
+    
+
+    /*
+function getWords(pack) {
+  onValue(ref(db, "data/"+pack), (snapshot) => {
+  const data = snapshot.val();
+  return data.words;
+  });
+};
+console.log(getWords("german"));
+var germanWords = Object.keys(getWords("german"));
+console.log(germanWords);    */
+
+function getWords(pack) {
+  return new Promise((resolve, reject) => {
+    onValue(ref(db, "data/" + pack), (snapshot) => {
+      const data = snapshot.val();
+      resolve(data.words);
+    }, (error) => {
+      reject(error);
+    });
+  });
+};
+
+var PackWords = null;
+var Pack = null;
+    
+function edit(path, info) { //etc removeWord(german.set+"/words/"+word.word);, info=null for remove
+      set(ref(db, "data/"+path), info, (error) => {
+        if (error) {
+            console.error("Data could not be stored:", error);
+        } else {
+            console.log("Data stored successfully!");
+        }
+      });
+  };
+
+    
+const siteButton = document.getElementById('site');
+  siteButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    toSite()
+  }); 
+
+const submitButton = document.getElementById('submit');
+  submitButton.addEventListener('click', () => {
+    var word = {}
+    word.Article = document.getElementById("Article").value;
+    document.getElementById("Article").placeholder = document.getElementById("Article").value;
+    document.getElementById("Article").value = "";
+    word.word = document.getElementById("Word").value;
+      document.getElementById("Word").placeholder = document.getElementById("Word").value;
+    document.getElementById("Word").value = "";
+    word.meaning = document.getElementById("Meaning").value;
+      document.getElementById("Meaning").placeholder = document.getElementById("Meaning").value;
+     document.getElementById("Meaning").value = "";
+    word.stage = 0;
+    word.occurances = 0;
+    console.log("Word:", word.Article, word.word, "  means:", word.meaning);
+    // then save to database
+    edit(PACK+"/words/"+word.word, word);
+  }); 
+
+    
+    
+    
+
+/*return getWords(PACK)
+    .then((packWords) => {
+        console.log('test');
+});*/
+
+
+
+
+    
+    
+getWords(PACK)
+  .then((packWords) => {
+    // Use the resolved value of the promise
+    console.log(packWords);
+
+    // should sort the array
+    var wordsArray = Object.keys(packWords);
+    console.log(wordsArray); // then sort
+    
+    
+    
+    
+    
+    
+    
+    const quickSort = (arr) => {
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  let pivot = arr[0];
+  let leftArr = [];
+  let rightArr = [];
+
+  for (let i = 1; i < arr.length; i++) {
+    if (packWords[arr[i]].stage < packWords[pivot].stage) {
+      leftArr.push(arr[i]);
+    } else {
+      rightArr.push(arr[i]);
+    }
+  }
+  return [...quickSort(leftArr), pivot, ...quickSort(rightArr)];
+};  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    wordsArray = quickSort(wordsArray);
+    let container = document.getElementById("container");
+    for (let i = 0; i < wordsArray.length; i++) {
+      let textNode = document.createTextNode(wordsArray[i] + "  /   " + packWords[wordsArray[i]].stage + "  /   " + packWords[wordsArray[i]].occurances); //new text node
+      let paragraph = document.createElement("h3"); //new text element
+      paragraph.appendChild(textNode); //attach the two
+      container.appendChild(paragraph); //attach them to the container
+    }
+  })
+  .catch((error) => {
+    // Handle any errors that occur during the promise
+    console.log("Error occurred:", error);
+  });  
+    
+</script>
+
+</body>
+</html>
