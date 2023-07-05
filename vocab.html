@@ -1,10 +1,395 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Vocab App</title>
+    <title>V</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    .button-pressed {
+        background-color: #111;
+    }
+    </style>
 </head>
 <body>
-<h1>My training vocab app</h1>
+    
 
+<input type="button" id="menu" value="<-back">    
+    
+<h1 id="Text">Loading...</h1>
+<input type="button" id="rvl" value="Reveal!">  <!-- word transforms to its meaning -->
+      
+<input type="button" id="dd" value="Terrible -all">  <!-- modifiers change stage -->
+<input type="button" id="d" value="Below Standards -1">  
+<input type="button" id="constButton" value="Okay =0"> <!-- timer resets and occurance +1 -->  
+<input type="button" id="u" value="Good +1">     
+<input type="button" id="uu" value="Superb +2"> 
+
+<input type="button" id="prevButton" value="prev"> <!-- doesn't submit, brings up prevWord -->
+<input type="button" id="skipButton" value="Skip">  <!-- timer doesn't reset, submits without effect on stage -->   
+<input id='nextButton' type="button" onclick="" value="next">  <!-- submits, resets timer, modifies stage -->
+    
+<!--
+Terrible - resets counter
+Below standards - -1 to counter
+Unsure - 0 to counter
+Okay - +1 to counter
+Superb - +2 to counter
+-->
+    
+<script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-database.js"></script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, set, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1Cuzq95imnDZusfvqg_yCFGFcBsykk94",
+    authDomain: "vocab-c012d.firebaseapp.com",
+    projectId: "vocab-c012d",
+    storageBucket: "vocab-c012d.appspot.com",
+    messagingSenderId: "695356338687",
+    appId: "1:695356338687:web:a83de2d8ab45467d0477ca",
+    measurementId: "G-JZJNPDRVVL",
+    databaseURL: "https://vocab-c012d-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+    
+    
+    
+    
+    
+    
+    /*
+function getWords(pack) {
+  onValue(ref(db, "data/"+pack), (snapshot) => {
+  const data = snapshot.val();
+  return data.words;
+  });
+};
+console.log(getWords("german"));
+var germanWords = Object.keys(getWords("german"));
+console.log(germanWords);    */
+
+function getWords(pack) {
+  return new Promise((resolve, reject) => {
+    onValue(ref(db, "data/" + pack), (snapshot) => {
+      const data = snapshot.val();
+      resolve(data.words);
+    }, (error) => {
+      reject(error);
+    });
+  });
+}
+var prevWord = null;
+var randomWord = null;
+var PackWords = null;
+var Pack = null;
+    
+    
+const params = new URLSearchParams(window.location.search);
+if (params.get("pack") != null) {
+    var PACK = params.get("pack");
+} else {
+    var PACK = "german";
+};      
+console.log(PACK);
+    
+function nextWord(pack) {
+  return getWords(pack)
+    .then((packWords) => {
+      PackWords = packWords;
+      var wordsArray = Object.keys(packWords);
+      //console.log(wordsArray, packWords);
+      //console.log(randomWord, wordsArray);
+      if (randomWord != null) {
+          prevWord = randomWord;
+          wordsArray.splice(wordsArray.indexOf(prevWord), 1);
+          //console.log(wordsArray);
+          //console.log('prv', prevWord);
+      };
+      
+      var randomIndex = Math.floor(Math.random() * wordsArray.length);
+      randomWord = wordsArray[randomIndex];
+      Pack = pack;
+      //console.log('rndm word', randomWord)
+      //console.log(packWords[randomWord])
+      return randomWord;
+    })
+    /*.catch((error) => {
+      console.log("Error occurred:", error);
+      throw error; // re-throw the error to propagate it to the next catch block
+    });*/
+}
+    
+function edit(path, info) { //etc removeWord(german.set+"/words/"+word.word);, info=null for remove
+      set(ref(db, "data/"+path), info, (error) => {
+        if (error) {
+            console.error("Data could not be stored:", error);
+        } else {
+            console.log("Data stored successfully!");
+        }
+      });
+  };
+
+
+var word = {
+    "word":"Mond",
+    "stage": 0,
+    "meaning": "moon",
+    "Article": "Der"
+}
+
+
+nextWord(PACK)
+  .then((randomWord) => {
+    document.getElementById('Text').innerHTML = randomWord;
+    //console.log(randomWord);
+  })
+  /*.catch((error) => {
+    console.log("Error:", error);
+  })*/;
+    
+/*
+word veiw looks at all words in set and displays them (in possibly sorted order).
+set veiw looks at all sets and displays them in alphabetical order.
+
+todo:
+frontend
+previous word button -> frontend stores val
+
+
+possibly take occurance into account for nextWord's
+possible 'understanding' alongside 'occurances' for increased tailored study
+Possibly brings in new random words from a german dictionary when other words have mostly been majorily studied
+possibly hook up to stable diffusion to generate images
+*/
+/*
+  function writeUserData(pack) {
+      const db = getDatabase();
+      set(ref(db, "data/"), sets, (error) => {
+        if (error) {
+            console.error("Data could not be stored:", error);
+        } else {
+            console.log("Data stored successfully!");
+        }
+      });
+  };
+
+  var word = {
+      "word": "Guten tag",
+      "meaning": "Good day",
+      "stage": 0
+  };
+
+  var german = {"set":"german", "words":{}};
+  var sets = {};
+                
+  german.words[word.word] = word;
+  sets[german.set] = german;
+  sets["lsat"] = {};
+  sets["gre"] = {};
+  console.log(german);
+  console.log(sets);
+  writeUserData(german);
+*/
+
+var selected = null;
+var selectedStage = 0;
+function select(s) {
+    if (selected != null) {
+        //console.log(selected.id)
+        selected.classList.toggle("button-pressed");
+    } else {
+        //console.log(null);
+    }
+    selected = s;
+    if (selected != null) { 
+        selected.classList.toggle("button-pressed");
+    };
+};
+
+var basestr = 1.4; //just a guess/filler for now
+
+function next(pack) { 
+    // add to stage and occurances
+    if (selectedStage != null) {
+        //console.log(PackWords[randomWord]);
+        PackWords[randomWord].stage += selectedStage;
+        if (selectedStage == -2) {
+            PackWords[randomWord].stage = 0
+        };
+        if (selected != null) {
+            PackWords[randomWord].occurances += 1;
+        };
+        PackWords[randomWord].memstr = basestr ** PackWords[randomWord].stage
+        edit(Pack+"/words/"+PackWords[randomWord].word, PackWords[randomWord]);
+        console.log(PackWords[randomWord]);
+    };
+    nextWord(pack)  
+      .then((randomWord) => {
+        document.getElementById('Text').innerHTML = randomWord;
+        //console.log(randomWord);
+      })
+      .catch((error) => {
+        console.log('Error:', error);
+      });
+}
+
+function back(){
+    //console.log("prevv=", prevWord)
+    if (prevWord != null) {
+        document.getElementById('Text').innerHTML = prevWord;
+    };
+};
+    
+const nextButton = document.getElementById('nextButton');
+  nextButton.addEventListener('click', () => {
+    // Call the function
+    next(PACK);
+    select(null);
+  }); 
+const skipButton = document.getElementById('skipButton');
+  skipButton.addEventListener('click', () => {
+    // Call the function
+    next(PACK);
+    select(null);
+  }); 
+const prevButton = document.getElementById('prevButton');
+  prevButton.addEventListener('click', () => {
+    // Call the function
+    back()
+    select(null);
+  }); 
+const ddButton = document.getElementById('dd');
+  ddButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    select(ddButton)
+    selectedStage = -2;
+  }); 
+const dButton = document.getElementById('d');
+  dButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    select(dButton);
+    selectedStage = -1;
+  }); 
+const constButton = document.getElementById('constButton');
+  constButton.addEventListener('click', () => {
+    // Call the function
+    select(constButton)
+    selectedStage = 0;
+  }); 
+const uButton = document.getElementById('u');
+  uButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    select(uButton)
+    selectedStage = 1;
+  }); 
+const uuButton = document.getElementById('uu');
+  uuButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    select(uuButton);
+    selectedStage = 2;
+  }); 
+    
+    
+function toMenu(){
+    // Assuming you have some data stored in variables
+    //data I'm transferring: pack type
+    // Construct the URL with query parameters
+    /*
+    url += "?pack=" + encodeURIComponent(PACK);
+    
+    // Navigate to the new page
+    window.location.href = url;
+    //<a href="#wordList"><a> */
+    
+    let url = window.location.href;
+    console.log(url);
+    url = url.split("/vocab")[0];
+    //console.log(url);
+    url += '/list.html'; //should just get path by itself maybe
+    url += "?pack=" + encodeURIComponent(PACK);
+    //console.log(url);
+    // Navigate to the new page
+    window.location.href = url;
+};
+    
+const menuButton = document.getElementById('menu');
+  menuButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    toMenu()
+  }); 
+
+var flipped = false;
+const revealB = document.getElementById('rvl');
+  revealB.addEventListener('click', () => {
+    console.log(PackWords[randomWord]);
+    if (flipped == false) {
+        document.getElementById('Text').innerHTML = PackWords[randomWord].meaning;
+        flipped = true
+    } else {
+        document.getElementById('Text').innerHTML = PackWords[randomWord].word;
+        flipped = false
+    };
+  }); 
+    
+/* 
+todo:
+- lists/menus
+- timer/curve
+- algorithmic nextwords
+
+
+
+*/
+    </script>
+
+    
 </body>
 </html>
+
+
+
+
+<!--
+Algorithm:
+Forgetting curve: y=e^-x/S, S=-x/ln(y)
+Makes curve -> then re  constructs end curve -> compares and estimates next curve etc?
+Fibbonachi sequence
+0,1,2,3,5,8,13,21,34,55,89,144,233
+Cumulative: day number:
+1,2,4,7,12,20,33,54,88,143,232,376,609
+Feeling options:
+Terrible - resets counter
+Below standards - -1 to counter
+Unsure - 0 to counter
+Okay - +1 to counter
+Superb - +2 to counter
+
+Json structure:
+var german = []
+var lsat = []
+var gre = []
+var word = {
+    "word": ,
+    "stage":  ,
+    "last use":  ,
+    "occurances":
+}
+var data = {
+    "german": german,
+    "lsat": lsat,
+    "gre": gre,
+}
+var jsonString = JSON.stringify(data);   - converts object to JSON
+console.log(jsonString);
+
+-->
