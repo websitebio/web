@@ -4,7 +4,7 @@
     <title>Vocab App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
+<body style="background-color: RGB(220,250,250)">
 <!-- <h1>My training vocab app</h1> -->
 <input type="button" id="site" value="forward->"> 
 <h2>Add new word:</h2>
@@ -13,7 +13,7 @@
 <input id='Meaning' type="text" placeholder="Meaning:">
 <input id='submit' type="submit">
 <div id='container' style='width=100%' display='flex' margin='0 px'>
-    <h2>Words: Stage: Occurances:</h2>
+    <h2 id="title">Words: Stage: Occurances:</h2>
     </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
@@ -156,9 +156,17 @@ getWords(PACK)
     console.log(wordsArray); // then sort
     
     
+    var average_stage = 0;
+    var average_occr = 0;
+    for (let i = 0; i < wordsArray.length; i++) {
+        average_stage += packWords[wordsArray[i]].stage;
+        average_occr += packWords[wordsArray[i]].occurances;
+    };
+    average_stage = average_stage / wordsArray.length;
+    average_occr = average_occr / wordsArray.length;
     
-    
-    
+    document.getElementById("title").textContent = "Words: (" + wordsArray.length + ") Avg Stage: (" + average_stage + ") Avg Occurance: (" + average_occr + ")"
+    console.log("Words: (" + wordsArray.length + ") Avg Stage: (" + average_stage + ") Avg Occurance: (" + average_occr + ")");
     
     
     const quickSort = (arr) => {
