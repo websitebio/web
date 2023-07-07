@@ -116,6 +116,7 @@ const submitButton = document.getElementById('submit');
     console.log("set:", set);
     // then save to database
     edit(set.set, set);
+    edit(set.last_time, new Date().getTime());
       
     let textNode = document.createTextNode(set.set + "  /  " + 0 + "   /   " + 0)
     let paragraph = document.createElement("h3"); //new text element
@@ -157,7 +158,8 @@ getPacks()
   let rightArr = [];
 
   for (let i = 1; i < arr.length; i++) {
-    if (data[arr[i]].words.length < data[arr[pivot]].words.length) {
+    console.log(arr[i]);
+    if (Object.keys(data[arr[i]].words).length < Object.keys(data[pivot].words).length) {
       leftArr.push(arr[i]);
     } else {
       rightArr.push(arr[i]);
@@ -195,8 +197,13 @@ getPacks()
       paragraph.appendChild(textNode); //attach the two
       container.appendChild(paragraph); //attach them to the container
       let button = document.createElement("button"); //new text element
-      paragraph.appendChild(textNode); //attach the two
-      container.appendChild(paragraph); //attach them to the container
+      button.textContent = "test";
+      //button.onclick = toList(packsArray[i].set);
+      button.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML =
+            toList(packsArray[i]); //need to set somewhat static so its not looking at the latest i but what it was assigned
+        });
+      container.appendChild(button); //attach them to the container
     }
   });
   /*.catch((error) => {
