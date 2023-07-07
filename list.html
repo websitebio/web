@@ -6,6 +6,7 @@
 </head>
 <body style="background-color: RGB(220,250,250)">
 <!-- <h1>My training vocab app</h1> -->
+<input type="button" id="Slist" value="<-back">
 <input type="button" id="site" value="forward->"> 
 <h2>Add new word:</h2>
 <input id='Article' type="text" placeholder="Article or Type:">
@@ -70,7 +71,13 @@
     //<a href="#wordList"><a>
   };
     
-
+  function toslist() {
+    let url = window.location.href;
+    console.log(url);
+    url = url.split("/list")[0];
+    url += '/slist.html';
+    window.location.href = url;
+  }
     /*
 function getWords(pack) {
   onValue(ref(db, "data/"+pack), (snapshot) => {
@@ -113,6 +120,13 @@ const siteButton = document.getElementById('site');
     toSite()
   }); 
 
+const slistButton = document.getElementById('Slist');
+  slistButton.addEventListener('click', () => {
+    //document.getElementById('dd').innerHTML = 
+    toslist()
+  }); 
+    
+    
 const submitButton = document.getElementById('submit');
   submitButton.addEventListener('click', () => {
     var word = {}
@@ -127,7 +141,8 @@ const submitButton = document.getElementById('submit');
      document.getElementById("Meaning").value = "";
     word.stage = 0;
     word.occurances = 0;
-    console.log("Word:", word.Article, word.word, "  means:", word.meaning);
+      
+    console.log("Word:", word.Article, word.word, "  means:", word.meaning,);
     // then save to database
     edit(PACK+"/words/"+word.word, word);
   }); 
@@ -153,19 +168,32 @@ getWords(PACK)
 
     // should sort the array
     var wordsArray = Object.keys(packWords);
-    console.log(wordsArray); // then sort
+    //console.log(wordsArray); // then sort
     
     
     var average_stage = 0;
     var average_occr = 0;
+    const d = new Date().getTime();
     for (let i = 0; i < wordsArray.length; i++) {
-        average_stage += packWords[wordsArray[i]].stage;
-        average_occr += packWords[wordsArray[i]].occurances;
+        var word = packWords[wordsArray[i]];
+        average_stage += word.stage;
+        average_occr += word.occurances;
+        //word.time_till = /*(Math.log(0.5) * -1 * word.memstr)*24*60*60+*/word.LastTime - new Date().getTime()   //0.5 memory retention till next ses0
+        word.time_till = (Math.log(0.5) * -1 * word.memstr)*24*60*60-( d -word.LastTime)/1000;
+        //console.log("TT:", word.time_till);
+        //word.time_till -= new Date().getTime();
+        //console.log((Math.log(0.5) * -1 * word.memstr)*24*60*60, (d - word.LastTime)/1000);
+        //console.log(word.time_till/60/60/24, new Date().getTime());
+        //const result = word.time_till.toISOString().slice(11, 19);
+        //console.log(word.time_till);
+        if (word.time_till < 3600){
+            console.print("gah", word.time_till)
+        }
     };
     average_stage = average_stage / wordsArray.length;
     average_occr = average_occr / wordsArray.length;
     
-    document.getElementById("title").textContent = "Words: (" + wordsArray.length + ") Avg Stage: (" + average_stage + ") Avg Occurance: (" + average_occr + ")"
+    document.getElementById("title").textContent = "Words: (" + wordsArray.length + ") Avg Stage: (" + average_stage + ") Avg Occurance: (" + average_occr + ")    time_till:"
     console.log("Words: (" + wordsArray.length + ") Avg Stage: (" + average_stage + ") Avg Occurance: (" + average_occr + ")");
     
     
@@ -188,28 +216,21 @@ getWords(PACK)
   return [...quickSort(leftArr), pivot, ...quickSort(rightArr)];
 };  
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
     wordsArray = quickSort(wordsArray);
     let container = document.getElementById("container");
     for (let i = 0; i < wordsArray.length; i++) {
-      let textNode = document.createTextNode(wordsArray[i] + "  /   " + packWords[wordsArray[i]].stage + "  /   " + packWords[wordsArray[i]].occurances); //new text node
-      let paragraph = document.createElement("h3"); //new text element
+  //return String(Math.floor(packWords[wordsArray[i]] / 86400)).padStart(2, '0') + ':' + String(Math.floor((packWords[wordsArray[i]] % 86400) / 3600)).padStart(2, '0') + ':' + String(Math.floor((packWords[wordsArray[i]] % 3600) / 60)).padStart(2, '0');
+
+      let textNode = document.createTextNode(wordsArray[i] + "  /   " + packWords[wordsArray[i]].stage + "  /   " + packWords[wordsArray[i]].occurances+ "      ::      " + String(Math.floor(packWords[wordsArray[i]].time_till / 86400)).padStart(2, '0') + ':' + String(Math.floor((packWords[wordsArray[i]].time_till % 86400) / 3600)).padStart(2, '0') + ':' + String(Math.floor((packWords[wordsArray[i]].time_till % 3600) / 60)).padStart(2, '0')); //new text node
+      let paragraph = document.createElement("h3"); //new te.time_tillxt element
       paragraph.appendChild(textNode); //attach the two
       container.appendChild(paragraph); //attach them to the container
     }
   })
-  .catch((error) => {
+  /*.catch((error) => {
     // Handle any errors that occur during the promise
     console.log("Error occurred:", error);
-  });  
+  });  */
     
 </script>
 
