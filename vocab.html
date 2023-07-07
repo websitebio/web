@@ -113,12 +113,12 @@ function nextWord(pack) {
       if (randomWord != null) {
           prevWord = randomWord;
           wordsArray.splice(wordsArray.indexOf(prevWord), 1);
-          for (let i = 1; i < wordsArray.length; i++) {
+          for (let i = 0; i < wordsArray.length; i++) {
               //console.log(PackWords[wordsArray[i]].daily_occurances);
               if (PackWords[wordsArray[i]].daily_occurances != null) {
-                  console.log(PackWords[wordsArray[i]].daily_occurances, PackWords[wordsArray[i]].stage);
-                  if (((PackWords[wordsArray[i]].daily_occurances > 2) && (PackWords[wordsArray[i]].stage > 3)) || ((PackWords[wordsArray[i]].stage > 5) && (d - PackWords[wordsArray[i]].LastTime < PackWords[wordsArray[i]].time_till / 2))) {
-                      console.log(PackWords[wordsArray[i]].word);
+                  //console.log(PackWords[wordsArray[i]].daily_occurances, PackWords[wordsArray[i]].stage);
+                  if (((PackWords[wordsArray[i]].daily_occurances > 2) && (PackWords[wordsArray[i]].stage > 2)) || ((PackWords[wordsArray[i]].stage > 5) && (d - PackWords[wordsArray[i]].LastTime < PackWords[wordsArray[i]].time_till / 2))) {
+                      //console.log(PackWords[wordsArray[i]].word);
                       toRemove.push(PackWords[wordsArray[i]].word);
                   };
                 };
@@ -127,7 +127,8 @@ function nextWord(pack) {
           //console.log('prv', prevWord);
       };
       wordsArray = wordsArray.filter(function(x) { return toRemove.indexOf(x) < 0;});
-      console.log(wordsArray);
+      //console.log(wordsArray);
+      console.log(PackWords);
       
       
       
@@ -257,7 +258,34 @@ function select(s) {
 };
 
 var basestr = 1.4; //just a guess/filler for now
+var last_date = new Date().getTime()
 
+new Promise((resolve, reject) => {
+    onValue(ref(db, "data/" + PACK), (snapshot) => {
+      const data = snapshot.val();
+      if (last_date - data.last_date > 24*60*60*1000 ){ //then reset clock
+          //console.log("test");
+          data.last_date = last_date;
+          var ArrayOfWords = Object.keys(data.words);
+          for (let i = 1; i < ArrayOfWords.length; i++) {
+              //console.log(data.words[wordsArray[i]]);
+              data.words[ArrayOfWords[i]].daily_occurances = 0;
+          };
+          edit(PACK, data);
+        };
+        //console.log(last_date, data.last_date, 24*60*60*1000, last_date - data.last_date - 24*60*60*1000);
+      });
+    }, (error) => {
+      reject(error);
+    });
+    
+    
+    
+
+
+//-get last date -> compare to see if >24 -> if not then no edit, else 
+
+edit(Pack+"/last_date/", last_date);
 function next(pack) { 
     // add to stage and occurances
     if (selectedStage != null) {
@@ -282,7 +310,11 @@ function next(pack) {
     };
     nextWord(pack)  
       .then((randomWord) => {
-        document.getElementById('Text').innerHTML = randomWord;
+        if (randomWord != undefined){
+            document.getElementById('Text').innerHTML = randomWord;
+        } else {
+            document.getElementById('Text').innerHTML = "Daily occ Complete!"
+        };
         //console.log(randomWord);
       })
       .catch((error) => {
