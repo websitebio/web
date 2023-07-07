@@ -100,21 +100,34 @@ if (params.get("pack") != null) {
 } else {
     var PACK = "german";
 };      
-console.log(PACK);
+//console.log(PACK);
     
 function nextWord(pack) {
   return getWords(pack)
     .then((packWords) => {
       PackWords = packWords;
+      var toRemove = [];
       var wordsArray = Object.keys(packWords);
       //console.log(wordsArray, packWords);
       //console.log(randomWord, wordsArray);
       if (randomWord != null) {
           prevWord = randomWord;
           wordsArray.splice(wordsArray.indexOf(prevWord), 1);
+          for (let i = 1; i < wordsArray.length; i++) {
+              //console.log(PackWords[wordsArray[i]].daily_occurances);
+              if (PackWords[wordsArray[i]].daily_occurances != null) {
+                  console.log(PackWords[wordsArray[i]].daily_occurances, PackWords[wordsArray[i]].stage);
+                  if (((PackWords[wordsArray[i]].daily_occurances > 2) && (PackWords[wordsArray[i]].stage > 3)) || ((PackWords[wordsArray[i]].stage > 5) && (d - PackWords[wordsArray[i]].LastTime < PackWords[wordsArray[i]].time_till / 2))) {
+                      console.log(PackWords[wordsArray[i]].word);
+                      toRemove.push(PackWords[wordsArray[i]].word);
+                  };
+                };
+          };
           //console.log(wordsArray);
           //console.log('prv', prevWord);
       };
+      wordsArray = wordsArray.filter(function(x) { return toRemove.indexOf(x) < 0;});
+      console.log(wordsArray);
       
       
       
@@ -139,11 +152,12 @@ function nextWord(pack) {
       
 
       
-      console.log(wordsArray);
+      //console.log(wordsArray);
       quickSort(wordsArray);
-      console.log(wordsArray);
-      var randomIndex = Math.floor(Math.random() * (wordsArray.length * 0.05));
-      randomWord = wordsArray[randomIndex];
+      //console.log(wordsArray);
+      var randomIndex = Math.floor(Math.random() * (wordsArray.length * 0.5));
+      randomWord = wordsArray.reverse()[randomIndex];
+      //console.log(wordsArray);
       Pack = pack;
       //console.log('rndm word', randomWord)
       //console.log(packWords[randomWord])
@@ -254,12 +268,17 @@ function next(pack) {
         };
         if (selected != null) {
             PackWords[randomWord].occurances += 1;
+            if (PackWords[randomWord].daily_occurances == null) {
+                PackWords[randomWord].daily_occurances = 0;
+            } ;
+            PackWords[randomWord].daily_occurances +=1;
+            PackWords[randomWord].memstr += 0.001;
             PackWords[randomWord].LastTime = new Date().getTime();
-            console.log(PackWords[randomWord].LastTime);
+            //console.log(PackWords[randomWord].LastTime);
         };
         PackWords[randomWord].memstr = basestr ** PackWords[randomWord].stage;
         edit(Pack+"/words/"+PackWords[randomWord].word, PackWords[randomWord]);
-        console.log(PackWords[randomWord]);
+        //console.log(PackWords[randomWord]);
     };
     nextWord(pack)  
       .then((randomWord) => {
