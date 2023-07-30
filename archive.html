@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Who me? Let's see</title>
+</head>
+<body bgcolor= #02111B class="body">
+<style>
+    .body {
+        margin:0;
+        overflow-x:hidden;
+    }
+.nav-bar {
+  position: absolute;
+  width: 100vw;
+  /*padding: max(8vw, 2rem) max(10vw, 2rem);*/
+  z-index: 4;
+  background-color: #30292F;
+  border-bottom-left-radius: 5vh ;
+  border-bottom-right-radius: 500vh;
+  margin-top: 0;
+}
+
+.nav-bar-list {
+  list-style: none;
+  border-color: #3398db;
+  border-width: 5rem;
+  border-radius: 0.5rem;
+  gap: 3rem;
+  display: flex;
+  flex-direction: row;
+  padding-left: 0;
+}
+
+.nav {
+  font-family: Product Sans;
+  text-decoration: none;
+  font-size: max(2vw, 1.1rem);
+
+  background: linear-gradient(156deg, #3398db, #a463bf);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  cursor: pointer;
+} 
+
+    .title {
+        margin: 0;
+        font-size: max(4vw, 1rem);
+        padding-right: 50vw;
+    }
+.content-padding {
+    padding-top: 20vh;
+}
+    
+    .content {
+        background-color: #3F4045;
+        border-radius: 0.5rem;
+        text-align: center;
+        color: #5D737E
+    }
+    
+    .archive-list {
+        list-style: square;
+      border-color: #095009;
+      border-width: 0rem;
+      border-radius: 0.5rem;
+      gap: 0rem;
+      flex-direction: column;
+      padding-left: 0;
+      margin-bottom: 5px;
+    }
+    
+    .content-list {
+        background-color: #CDBAC4;
+        border-radius: 0vw;
+        text-align: left;
+        color: #5D737E;
+        border: 15px;
+    }
+    
+    .content-list-img {
+        
+    }
+    
+    .content-list-title {
+        background-color: #3F4045;
+        border-radius: 0.5rem;
+        padding-left: 10vw  ;
+        padding-right: 10vw ;
+        text-align: right;
+        color: #5D737E
+        
+    }
+    </style>
+<div class="nav-bar">
+    <ul class="nav-bar-list">
+        <li class="nav">
+            <p class="title">Bens blog</p>
+        </li>
+        <li class="nav">
+            <a class="nav" href="#latest"> Latest </a>
+        </li> 
+        <li class="nav">
+            <a class="nav" href="#about"> About </a>
+        </li>
+        <li class="nav">
+            <a class="nav" href="#archive"> Archive </a>
+        </li>
+    </ul>
+</div>
+<div class="content-padding">
+    <div class="content">
+        <h1>Content</h1>
+        <div>
+            <ul class="archive-list">
+                <li><h2>2023 posts</h2>
+                    <ul class="content-list">
+                        <div class="content-list">
+                            <!--box with image and title and hover highlight!-->
+                            <img src="transp_back.png" style="width: 5vw;position: relative; margin-top: 0px; border: 0px solid red; margin-left: 14vw; margin-right: auto;">
+                            <a href="/latest" class="content-list-title">Title here</a>
+                        </div>
+                        <div class="content-list">
+                            <!--box with image and title and hover highlight!-->
+                            <img src="transp_back.png" style="width: 5vw;position: relative; margin-top: 0px; border: 0px solid red; margin-left: 14vw; margin-right: auto;">
+                            <a href="" class="content-list-title">Title here</a>
+                        </div>
+                        <div class="content-list">
+                            <!--box with image and title and hover highlight!-->
+                            <img src="transp_back.png" style="width: 5vw;position: relative; margin-top: 0px; border: 0px solid red; margin-left: 14vw; margin-right: auto;">
+                            <a href="" class="content-list-title">Title here</a>
+                        </div>
+                    </ul>
+                </li>
+                <li><h2>2022 posts</h2>
+                    <ul>
+                    </ul>
+                </li>
+                <li><h2>2021 posts</h2>
+                    <ul>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>  
+</div>
+    
+    
+    
+    
+    <scipt>
+    </scipt>
+</body>
+</html>
